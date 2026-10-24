@@ -1,0 +1,22 @@
+{
+  "name": "saylani-hcm-lite",
+  "version": "1.0.0",
+  "description": "HCM Lite - AI-Assisted Human Capital Management (Saylani Hackathon)",
+  "private": true,
+  "scripts": {
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "test:all": "node server/tests/phase1_test.js && node server/tests/phase2_test.js && node server/tests/phase3_test.js && node server/tests/phase4_test.js && node server/tests/phase5_test.js && node server/tests/phase6_test.js && node server/tests/phase7_test.js",
+    "test:server": "npm --prefix server test"
+  },
+  "keywords": [
+    "hcm",
+    "saylani",
+    "hackathon",
+    "ai",
+    "fullstack"
+  ],
+  "author": "",
+  "license": "ISC"
+}
