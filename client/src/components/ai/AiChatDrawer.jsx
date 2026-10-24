@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import { 
   Bot, X, Send, Sparkles, Shield, Wrench, CheckCircle, 
   AlertCircle, Calendar, Clock, ArrowRight, UserCheck, RefreshCw, MessageSquare
@@ -37,14 +38,8 @@ export default function AiChatDrawer({ isOpen, onClose }) {
   const fetchLogs = async () => {
     setLoadingLogs(true);
     try {
-      const token = localStorage.getItem('hcm_token');
-      const res = await fetch('/api/ai/logs', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setAiLogs(data.logs || []);
-      }
+      const data = await api.get('/ai/logs');
+      setAiLogs(data.logs || []);
     } catch (err) {
       console.error('Failed to load AI logs:', err);
     } finally {
@@ -67,31 +62,7 @@ export default function AiChatDrawer({ isOpen, onClose }) {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('hcm_token');
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ prompt: promptToSend })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMessages(prev => [
-          ...prev,
-          {
-            id: (Date.now() + 1).toString(),
-            sender: 'assistant',
-            text: data.error || 'Failed to process AI query.',
-            isError: true,
-            isAiGenerated: true
-          }
-        ]);
-        return;
-      }
+      const data = await api.post('/ai/chat', { prompt: promptToSend });
 
       setMessages(prev => [
         ...prev,
@@ -110,7 +81,7 @@ export default function AiChatDrawer({ isOpen, onClose }) {
         {
           id: (Date.now() + 1).toString(),
           sender: 'assistant',
-          text: 'Network error connecting to AI Assistant engine.',
+          text: err.message || 'Failed to process AI query.',
           isError: true,
           isAiGenerated: true
         }
@@ -125,45 +96,27 @@ export default function AiChatDrawer({ isOpen, onClose }) {
     setConfirmingLeave(true);
     setLeaveSuccess(null);
     try {
-      const token = localStorage.getItem('hcm_token');
-      
       // Fetch leave types to get ID matching leave_type
-      const typeRes = await fetch('/api/leave/types', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const types = await typeRes.json();
+      const types = await api.get('/leave/types');
       const matched = types.find(t => t.name.toLowerCase() === smartLeave.leave_type.toLowerCase()) || types[0];
 
-      const res = await fetch('/api/leave/apply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          leave_type_id: matched.id,
-          start_date: smartLeave.start_date,
-          end_date: smartLeave.end_date,
-          reason: smartLeave.reason
-        })
+      const result = await api.post('/leave/apply', {
+        leave_type_id: matched.id,
+        start_date: smartLeave.start_date,
+        end_date: smartLeave.end_date,
+        reason: smartLeave.reason
       });
 
-      const result = await res.json();
-
-      if (res.ok) {
-        setLeaveSuccess(`✅ Leave application submitted successfully! Reference ID #${result.leave.id}. Awaiting HR approval.`);
-        setMessages(prev => [
-          ...prev,
-          {
-            id: (Date.now() + 2).toString(),
-            sender: 'assistant',
-            text: `🎉 Success! Your ${smartLeave.leave_type} leave from ${smartLeave.start_date} to ${smartLeave.end_date} has been officially recorded in the database. HR has been notified for approval.`,
-            isAiGenerated: true
-          }
-        ]);
-      } else {
-        alert(result.error || 'Failed to submit leave.');
-      }
+      setLeaveSuccess(`✅ Leave application submitted successfully! Reference ID #${result.leave.id}. Awaiting HR approval.`);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: (Date.now() + 2).toString(),
+          sender: 'assistant',
+          text: `🎉 Success! Your ${smartLeave.leave_type} leave from ${smartLeave.start_date} to ${smartLeave.end_date} has been officially recorded in the database. HR has been notified for approval.`,
+          isAiGenerated: true
+        }
+      ]);
     } catch (err) {
       alert('Error submitting leave: ' + err.message);
     } finally {

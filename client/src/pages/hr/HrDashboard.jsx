@@ -36,16 +36,7 @@ export default function HrDashboard({ onOpenAi }) {
   const handleSummarize = async () => {
     try {
       setSummarizing(true);
-      const token = localStorage.getItem('hcm_token');
-      const res = await fetch('/api/ai/summarize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ kpis, role: 'HR' })
-      });
-      const data = await res.json();
+      const data = await api.post('/ai/summarize', { kpis, role: 'HR' });
       setAiSummary(data);
     } catch (e) {
       console.error(e);

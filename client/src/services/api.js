@@ -1,4 +1,6 @@
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL.replace(/\/+$/, '')}/api` 
+  : '/api';
 
 export const api = {
   getToken() {
@@ -67,3 +69,5 @@ export const api = {
     return this.request(endpoint, { ...options, method: 'DELETE' });
   }
 };
+
+export { API_BASE };
