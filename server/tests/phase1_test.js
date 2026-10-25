@@ -6,10 +6,13 @@ console.log('🧪 Running Phase 1 Automated Test Suite...');
 
 try {
   // 1. Reset test state
+  db.pragma('foreign_keys = OFF');
   db.prepare(`DELETE FROM users`).run();
   db.prepare(`DELETE FROM company_settings`).run();
   db.prepare(`DELETE FROM audit_logs`).run();
   db.prepare(`DELETE FROM leave_types`).run();
+  db.prepare(`DELETE FROM employees`).run();
+  db.pragma('foreign_keys = ON');
 
   // Test 1: Check First Run Status
   const status1 = authService.checkFirstRunStatus();

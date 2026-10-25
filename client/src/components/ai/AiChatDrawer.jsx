@@ -142,55 +142,77 @@ export default function AiChatDrawer({ isOpen, onClose }) {
   ];
 
   return (
-    <div className="modal-backdrop" style={{ alignItems: 'stretch', justifyContent: 'flex-end', padding: 0 }}>
+    <div 
+      className="modal-backdrop" 
+      style={{ 
+        alignItems: 'stretch', 
+        justifyContent: 'flex-end', 
+        padding: 0,
+        zIndex: 1100
+      }}
+      onClick={onClose}
+    >
       <div 
-        className="glass-card" 
+        onClick={e => e.stopPropagation()}
         style={{
-          width: '520px',
+          width: '500px',
           maxWidth: '100vw',
           height: '100vh',
-          borderRadius: 0,
-          borderLeft: '1px solid var(--border-color)',
+          background: 'var(--surface-solid)',
+          borderLeft: '1px solid var(--border)',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.4)',
-          background: 'var(--bg-glass)',
-          backdropFilter: 'blur(20px)',
-          animation: 'slideIn 0.3s ease-out'
+          boxShadow: '-12px 0 45px rgba(0, 0, 0, 0.55)',
+          animation: 'slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
       >
         {/* Drawer Header */}
         <div style={{
           padding: '1.25rem 1.5rem',
-          borderBottom: '1px solid var(--border-color)',
+          borderBottom: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(99, 102, 241, 0.08)'
+          background: 'var(--surface)',
+          backdropFilter: 'blur(12px)',
+          flexShrink: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
+              width: '42px',
+              height: '42px',
               borderRadius: '12px',
               background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
+              boxShadow: '0 4px 14px rgba(99, 102, 241, 0.45)',
+              position: 'relative'
             }}>
               <Bot size={22} />
+              <div style={{
+                position: 'absolute',
+                bottom: '-2px',
+                right: '-2px',
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                background: 'var(--success)',
+                border: '2px solid var(--surface-solid)'
+              }} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontWeight: '700', fontSize: '1.0625rem' }}>HCM Assistant</span>
-                <span className="badge badge-success" style={{ fontSize: '0.6875rem' }}>
+                <span style={{ fontWeight: '700', fontSize: '1.0625rem', color: 'var(--text-primary)' }}>HCM Assistant</span>
+                <span className="badge badge-success" style={{ fontSize: '0.6875rem', padding: '0.2rem 0.5rem' }}>
                   <Sparkles size={10} style={{ marginRight: '3px' }} /> 7 Tools Active
                 </span>
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', gap: '0.5rem' }}>
-                <span>Role: {user?.role}</span>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', gap: '0.5rem', marginTop: '0.125rem' }}>
+                <span>Role: <strong style={{ color: 'var(--text-secondary)' }}>{user?.role}</strong></span>
                 <span>•</span>
                 <span>20 req/hr rate limit</span>
               </div>
@@ -210,7 +232,7 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                   }
                 }}
                 title="View AI Audit Logs"
-                style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
               >
                 {activeTab === 'chat' ? 'Audit Logs' : 'Back to Chat'}
               </button>
@@ -218,7 +240,15 @@ export default function AiChatDrawer({ isOpen, onClose }) {
             <button 
               className="btn btn-secondary btn-sm" 
               onClick={onClose}
-              style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0 }}
+              style={{
+                borderRadius: '50%',
+                width: '34px',
+                height: '34px',
+                padding: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
             >
               <X size={18} />
             </button>
@@ -227,15 +257,15 @@ export default function AiChatDrawer({ isOpen, onClose }) {
 
         {/* Audit Logs View (for Judges/Admins to verify transparency) */}
         {activeTab === 'logs' ? (
-          <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem', background: 'var(--bg-primary)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ fontSize: '0.9375rem', fontWeight: '700', margin: 0 }}>Recent AI Query Audit Trail</h3>
+              <h3 style={{ fontSize: '0.9375rem', fontWeight: '700', margin: 0, color: 'var(--text-primary)' }}>Recent AI Query Audit Trail</h3>
               <button className="btn btn-secondary btn-sm" onClick={fetchLogs} disabled={loadingLogs}>
                 <RefreshCw size={14} className={loadingLogs ? 'spin' : ''} /> Refresh
               </button>
             </div>
             {aiLogs.length === 0 ? (
-              <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>
+              <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem 1rem' }}>
                 No recorded AI logs yet.
               </div>
             ) : (
@@ -243,23 +273,23 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                 {aiLogs.map(log => (
                   <div key={log.id} style={{
                     padding: '0.875rem',
-                    background: 'var(--bg-glass)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '8px',
+                    background: 'var(--surface-solid)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-md)',
                     fontSize: '0.8125rem'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
-                      <span className="badge badge-info" style={{ fontSize: '0.6875rem' }}>
+                      <span className="badge badge-employee" style={{ fontSize: '0.6875rem' }}>
                         {log.tool_called || 'direct_reply'}
                       </span>
                       <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
                         {log.duration_ms}ms • {new Date(log.created_at).toLocaleTimeString()}
                       </span>
                     </div>
-                    <div style={{ fontWeight: '600', color: 'var(--primary)', marginBottom: '0.25rem' }}>
+                    <div style={{ fontWeight: '600', color: 'var(--primary)', marginBottom: '0.35rem' }}>
                       "{log.prompt}"
                     </div>
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', maxHeight: '60px', overflowY: 'auto' }}>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', maxHeight: '70px', overflowY: 'auto', lineHeight: '1.4' }}>
                       {log.response}
                     </div>
                   </div>
@@ -273,12 +303,13 @@ export default function AiChatDrawer({ isOpen, onClose }) {
             {/* Quick Prompt Chips */}
             <div style={{
               padding: '0.75rem 1.25rem',
-              borderBottom: '1px solid var(--border-color)',
-              background: 'rgba(0,0,0,0.1)',
+              borderBottom: '1px solid var(--border)',
+              background: 'var(--surface-hover)',
               overflowX: 'auto',
               whiteSpace: 'nowrap',
               display: 'flex',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              flexShrink: 0
             }}>
               {quickChips.map((chip, idx) => (
                 <button
@@ -287,20 +318,26 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                   disabled={loading}
                   style={{
                     fontSize: '0.75rem',
-                    padding: '0.35rem 0.75rem',
+                    padding: '0.4rem 0.85rem',
                     borderRadius: '20px',
-                    border: '1px solid var(--border-color)',
-                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--surface-solid)',
                     color: 'var(--text-primary)',
                     cursor: 'pointer',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.35rem',
-                    transition: 'all 0.2s',
+                    gap: '0.4rem',
+                    transition: 'var(--transition)',
                     flexShrink: 0
                   }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--primary)'}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = 'var(--primary)';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
                 >
                   <Sparkles size={12} color="var(--primary)" />
                   {chip}
@@ -315,7 +352,8 @@ export default function AiChatDrawer({ isOpen, onClose }) {
               padding: '1.25rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem'
+              gap: '1rem',
+              background: 'var(--bg-primary)'
             }}>
               {messages.map(msg => (
                 <div
@@ -335,9 +373,10 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                       fontSize: '0.6875rem',
                       fontWeight: '600',
                       color: msg.toolCalled.includes('refusal') ? '#f87171' : 'var(--primary)',
-                      marginBottom: '0.25rem',
-                      padding: '0.15rem 0.5rem',
+                      marginBottom: '0.35rem',
+                      padding: '0.2rem 0.6rem',
                       background: msg.toolCalled.includes('refusal') ? 'rgba(239, 68, 68, 0.15)' : 'rgba(99, 102, 241, 0.15)',
+                      border: `1px solid ${msg.toolCalled.includes('refusal') ? 'rgba(239, 68, 68, 0.3)' : 'rgba(99, 102, 241, 0.3)'}`,
                       borderRadius: '12px'
                     }}>
                       {msg.toolCalled.includes('refusal') ? (
@@ -353,16 +392,16 @@ export default function AiChatDrawer({ isOpen, onClose }) {
 
                   {/* Message Bubble */}
                   <div style={{
-                    maxWidth: '85%',
+                    maxWidth: '88%',
                     padding: '0.875rem 1.125rem',
                     borderRadius: msg.sender === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                     background: msg.sender === 'user'
                       ? 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)'
-                      : 'var(--bg-card)',
+                      : 'var(--surface-solid)',
                     color: msg.sender === 'user' ? '#ffffff' : 'var(--text-primary)',
-                    border: msg.sender === 'user' ? 'none' : '1px solid var(--border-color)',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    lineHeight: '1.45',
+                    border: msg.sender === 'user' ? 'none' : '1px solid var(--border)',
+                    boxShadow: 'var(--shadow-sm)',
+                    lineHeight: '1.5',
                     fontSize: '0.875rem'
                   }}>
                     {msg.text}
@@ -373,13 +412,13 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                         marginTop: '0.875rem',
                         padding: '0.875rem',
                         background: 'rgba(99, 102, 241, 0.08)',
-                        border: '1px solid rgba(99, 102, 241, 0.3)',
-                        borderRadius: '10px'
+                        border: '1px solid rgba(99, 102, 241, 0.35)',
+                        borderRadius: 'var(--radius-md)'
                       }}>
-                        <div style={{ fontWeight: '700', color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <div style={{ fontWeight: '700', color: 'var(--primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8125rem' }}>
                           <Calendar size={15} /> Prepared Leave Application
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', fontSize: '0.75rem', marginBottom: '0.625rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', fontSize: '0.75rem', marginBottom: '0.75rem' }}>
                           <div><strong>Type:</strong> {msg.smartLeave.leave_type} Leave</div>
                           <div><strong>Days:</strong> {msg.smartLeave.working_days} working days</div>
                           <div><strong>Start:</strong> {msg.smartLeave.start_date}</div>
@@ -409,7 +448,7 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                         color: msg.sender === 'user' ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.25rem'
+                        gap: '0.3rem'
                       }}>
                         <Sparkles size={10} /> AI-generated • Always verify against company policy
                       </div>
@@ -438,24 +477,29 @@ export default function AiChatDrawer({ isOpen, onClose }) {
             {/* Input Bar */}
             <div style={{
               padding: '1rem 1.25rem',
-              borderTop: '1px solid var(--border-color)',
-              background: 'var(--bg-glass)'
+              borderTop: '1px solid var(--border)',
+              background: 'var(--surface-solid)',
+              flexShrink: 0
             }}>
               <form 
                 onSubmit={e => {
                   e.preventDefault();
                   handleSend();
                 }}
-                style={{ display: 'flex', gap: '0.5rem' }}
+                style={{ display: 'flex', gap: '0.625rem', alignItems: 'center' }}
               >
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-input"
                   placeholder="Ask in English or Roman Urdu (e.g. kitni chuttiyan bachi hen?)..."
                   value={inputPrompt}
                   onChange={e => setInputPrompt(e.target.value)}
                   disabled={loading}
-                  style={{ borderRadius: '24px', paddingLeft: '1rem' }}
+                  style={{
+                    borderRadius: 'var(--radius-full)',
+                    padding: '0.75rem 1.25rem',
+                    fontSize: '0.875rem'
+                  }}
                 />
                 <button
                   type="submit"
@@ -469,7 +513,8 @@ export default function AiChatDrawer({ isOpen, onClose }) {
                     flexShrink: 0,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px var(--primary-glow)'
                   }}
                 >
                   <Send size={18} />
